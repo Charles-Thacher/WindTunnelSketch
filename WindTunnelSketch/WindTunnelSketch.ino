@@ -16,9 +16,8 @@ void setup() {
   lcd.begin(8, 2);  // 8 characters, 2 lines; the mode of operation
                     // Text████
                     // █Display
-  int test = 420;
-  lcd.print(test);  // prints the value of the variable
-  lcd.print("m/s"); // Prints the text immediately after last line
+
+  lcd.print("Initiate");  // prints the value of the variable
   //end stitch
   //I'm hoping these two processes at least function simultaneously
   delay(1000);
@@ -67,4 +66,13 @@ void loop() {
   lcd.setCursor(0,1); //second row, first column
   lcd.print("B ");
   lcd.print(weightB32);
+
+  delay(1000);
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("END LOOP");
+  lcd.setCursor(0,1);
+  lcd.print("END LOOP");
+  delay(1000);
+  lcd.clear();
 }
