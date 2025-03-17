@@ -3,10 +3,12 @@ This repository stores the relevant Sketch files for the Wind Tunnel project cre
 
 # Libraries
 Adafruit_HX711.h
+
 LiquidCrystal.h - https://docs.arduino.cc/libraries/liquidcrystal/
 
 # Credits
 Evan Halstead, Project Advisor
+
 Student Opportunity Fund, Skidmore College
 
 # Wiring Guide
