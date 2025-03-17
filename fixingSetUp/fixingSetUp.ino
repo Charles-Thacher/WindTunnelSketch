@@ -18,7 +18,7 @@ void setup() {
   while (!Serial) {
     delay(10);
   }
-
+  
   // 1. Set up LCD
   lcdSetUp();
 
@@ -28,8 +28,6 @@ void setup() {
   // read and toss 3 values each
   Serial.println("Taring....");
   for (uint8_t t=0; t<3; t++) {
-    // Channel A is 128 gain and Channel B is 32 gain
-    // Gain is amplification
     hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
     hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
     hx711.tareB(hx711.readChannelRaw(CHAN_B_GAIN_32));
@@ -84,52 +82,38 @@ void lcdSetUp() {
   // https://github.com/Charles-Thacher/WindTunnelSketch
 }
 
-void loadCellSetUp() {
-  hx711.begin();
-
-  // read and toss 3 values each
-  Serial.println("Taring....");
-  for (uint8_t t=0; t<3; t++) {
-    hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
-    hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
-
-    hx711.tareB(hx711.readChannelRaw(CHAN_B_GAIN_32));
-    hx711.tareB(hx711.readChannelRaw(CHAN_B_GAIN_32));
-  }
-}
 
 // # Running tests here
 // a running average function which takes the n most recent readings (determined with SIZE) and averages them
-// int runningAverage() {
-//   const int SIZE = 5; // number of readings that will be averaged
-//   // Initialize the array
-//   int runningArray[SIZE] = {}; // creates a 0 array
+int runningAverage() {
+  const int SIZE = 5; // number of readings that will be averaged
 
-//   int32_t latestValue = hx711.readChannelBlocking(CHAN_A_GAIN_128);
+  // Initialize the array
+  int runningArray[SIZE] = {}; // creates a 0 array with length SIZE
 
-//   // shift all elements in runningArray 1 position down
-//   for (int j = SIZE - 1; j > 0; j--) {
-//     runningArray[j] = runningArray[j - 1];
-//   }
+  int32_t latestValue = hx711.readChannelBlocking(CHAN_A_GAIN_128);
 
-//   // append the latest value to the array
-//   runningArray[0] = latestValue;
+  // shift all elements in runningArray 1 position down
+  for (int j = SIZE - 1; j > 0; j--) {
+    runningArray[j] = runningArray[j - 1];
+  }
 
-//   // average the array contents
-//   int32_t arraySum = 0;
-//   int32_t arrayAvg = 0;
+  // append the latest value to the array
+  runningArray[0] = latestValue;
 
-//   for (int i = 0; i < SIZE; i++) {
-//     arraySum += runningArray[i];
-//   }
+  // average the array contents
+  int32_t arraySum = 0;
+  int32_t arrayAvg = 0;
 
-//   arrayAvg = arraySum/SIZE;
+  for (int i = 0; i < SIZE; i++) {
+    arraySum += runningArray[i];
+  }
 
-//   Serial.println(arrayAvg);
+  arrayAvg = arraySum/SIZE;
 
-// }
-
-
+  Serial.println(arrayAvg);
+  return arrayAvg;
+}
 
 // callibration
 
