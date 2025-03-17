@@ -1,8 +1,6 @@
 #include "Adafruit_HX711.h"
 #include <LiquidCrystal.h>
 
-
-
 void setup() {
   Serial.begin(115200);
   // wait for serial port to connect. Needed for native USB port only
@@ -15,8 +13,6 @@ void setup() {
   loadCellSetUp();
   // LCD setup
   lcdSetUp();
-  // Initialize the HX711
-  
 } 
 
 void loop() {
