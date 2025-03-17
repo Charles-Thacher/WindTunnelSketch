@@ -1,18 +1,30 @@
 #include "Adafruit_HX711.h"
 #include <LiquidCrystal.h>
 
+// Define the pins for the HX711 communication
+const uint8_t DATA_PIN = 6;  // Can use any pins!
+const uint8_t CLOCK_PIN = 5; // Can use any pins!
+
+//LiquidCrystal lcd(RS, E, D4, D5, D6, D7);
+LiquidCrystal lcd(9, 8, 10, 11, 12, 13);      // put your pin numbers here
+
+Adafruit_HX711 hx711(DATA_PIN, CLOCK_PIN);
+
 void setup() {
+  // 1. Connect to serial
   Serial.begin(115200);
+
   // wait for serial port to connect. Needed for native USB port only
   while (!Serial) {
     delay(10);
   }
-
-  // I've split up the setup into some other functions to keep things a little more organized.
-  // Load Cell setup
-  loadCellSetUp();
-  // LCD setup
+  
+  // 1. Set up LCD
   lcdSetUp();
+
+  // 3. Set up Load Cell and hx711
+  loadCellSetUp();
+  
 } 
 
 void loop() {
@@ -48,10 +60,6 @@ void loop() {
 }
 
 void lcdSetUp() {
-  //LiquidCrystal lcd(RS, E, D4, D5, D6, D7);
-  // this snippet was above the void setup, so it might be a source of error if it's in this function
-  LiquidCrystal lcd(9, 8, 10, 11, 12, 13);      // put your pin numbers here
-
   lcd.begin(8, 2);  // 8 characters, 2 lines; the mode of operation. 
                     // How it looks:
                     // Text████
@@ -66,12 +74,6 @@ void lcdSetUp() {
 }
 
 void loadCellSetUp() {
-  // Define the pins for the HX711 communication
-  const uint8_t DATA_PIN = 6;  // Can use any pins!
-  const uint8_t CLOCK_PIN = 5; // Can use any pins!
-
-  Adafruit_HX711 hx711(DATA_PIN, CLOCK_PIN);
-
   hx711.begin();
 
   // read and toss 3 values each
@@ -87,34 +89,34 @@ void loadCellSetUp() {
 
 // # Running tests here
 // a running average function which takes the n most recent readings (determined with SIZE) and averages them
-int runningAverage() {
-  const int SIZE = 5; // number of readings that will be averaged
-  // Initialize the array
-  int runningArray[SIZE] = {}; // creates a 0 array
+// int runningAverage() {
+//   const int SIZE = 5; // number of readings that will be averaged
+//   // Initialize the array
+//   int runningArray[SIZE] = {}; // creates a 0 array
 
-  int32_t latestValue = hx711.readChannelBlocking(CHAN_A_GAIN_128);
+//   int32_t latestValue = hx711.readChannelBlocking(CHAN_A_GAIN_128);
 
-  // shift all elements in runningArray 1 position down
-  for (int j = SIZE - 1; j > 0; j--) {
-    runningArray[j] = runningArray[j - 1];
-  }
+//   // shift all elements in runningArray 1 position down
+//   for (int j = SIZE - 1; j > 0; j--) {
+//     runningArray[j] = runningArray[j - 1];
+//   }
 
-  // append the latest value to the array
-  runningArray[0] = latestValue;
+//   // append the latest value to the array
+//   runningArray[0] = latestValue;
 
-  // average the array contents
-  int32_t arraySum = 0;
-  int32_t arrayAvg = 0;
+//   // average the array contents
+//   int32_t arraySum = 0;
+//   int32_t arrayAvg = 0;
 
-  for (int i = 0; i < SIZE; i++) {
-    arraySum += runningArray[i];
-  }
+//   for (int i = 0; i < SIZE; i++) {
+//     arraySum += runningArray[i];
+//   }
 
-  arrayAvg = arraySum/SIZE;
+//   arrayAvg = arraySum/SIZE;
 
-  Serial.println(arrayAvg);
+//   Serial.println(arrayAvg);
 
-}
+// }
 
 
 
