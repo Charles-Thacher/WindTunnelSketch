@@ -48,16 +48,6 @@ void loop() {
   lcd.print("A ");
   lcd.print(weightA128);
 
-  // Read from Channel A with Gain 128, can also try CHAN_A_GAIN_64 or CHAN_B_GAIN_32
-  int32_t weightB32 = hx711.readChannelBlocking(CHAN_B_GAIN_32);
-  Serial.print("Channel B (Gain 32): ");
-  Serial.println(weightB32);
-
-  // repeat prints to LCD
-  lcd.setCursor(0,1); //second row, first column
-  lcd.print("B ");
-  lcd.print(weightB32);
-
   delay(1000);
   lcd.clear();
   lcd.setCursor(0,0);
@@ -68,23 +58,10 @@ void loop() {
   lcd.clear();
 }
 
-void lcdSetUp() {
-  lcd.begin(8, 2);  // 8 characters, 2 lines; the mode of operation. 
-                    // How it looks:
-                    // Text████
-                    // █Display
-
-  lcd.print("Initiate");  // prints the value of the variable
-
-  Serial.println("LCD Initialized.");
-  
-  // See the README on this sketch's GitHub repository for detailed wiring guide
-  // https://github.com/Charles-Thacher/WindTunnelSketch
-}
 
 
-// # Running tests here
-// a running average function which takes the n most recent readings (determined with SIZE) and averages them
+
+// Load Cell Running Average Report
 int runningAverage() {
   const int SIZE = 5; // number of readings that will be averaged
 
@@ -116,4 +93,21 @@ int runningAverage() {
 }
 
 // callibration
+void loadCellCallibration() {
+  //
+}
+
+void lcdSetUp() {
+  lcd.begin(8, 2);  // 8 characters, 2 lines; the mode of operation. 
+    // How it looks:
+    // Text████
+    // █Display
+
+  lcd.print("Initiate");  // prints the value of the variable
+
+  Serial.println("LCD Initialized.");
+  
+  // See the README on this sketch's GitHub repository for detailed wiring guide
+  // https://github.com/Charles-Thacher/WindTunnelSketch
+}
 

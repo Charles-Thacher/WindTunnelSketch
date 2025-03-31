@@ -1,18 +1,39 @@
 #include "Adafruit_HX711.h"
 #include <LiquidCrystal.h>
 
+// Define the pins for the HX711 communication
+const uint8_t DATA_PIN = 6;  // Can use any pins!
+const uint8_t CLOCK_PIN = 5; // Can use any pins!
+
+//LiquidCrystal lcd(RS, E, D4, D5, D6, D7);
+LiquidCrystal lcd(9, 8, 10, 11, 12, 13);      // put your pin numbers here
+
+Adafruit_HX711 hx711(DATA_PIN, CLOCK_PIN);
+
 void setup() {
+  // 1. Connect to serial
   Serial.begin(115200);
+
   // wait for serial port to connect. Needed for native USB port only
   while (!Serial) {
     delay(10);
   }
-
-  // I've split up the setup into some other functions to keep things a little more organized.
-  // Load Cell setup
-  loadCellSetUp();
-  // LCD setup
+  
+  // 1. Set up LCD
   lcdSetUp();
+
+  // 3. Set up Load Cell and hx711
+  hx711.begin();
+
+  // read and toss 3 values each
+  Serial.println("Taring....");
+  for (uint8_t t=0; t<3; t++) {
+    hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
+    hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
+    hx711.tareB(hx711.readChannelRaw(CHAN_B_GAIN_32));
+    hx711.tareB(hx711.readChannelRaw(CHAN_B_GAIN_32));
+  }
+  
 } 
 
 void loop() {
@@ -45,6 +66,8 @@ void loop() {
   lcd.print("END LOOP");
   delay(1000);
   lcd.clear();
+
+  runningAverage();
 }
 
 void lcdSetUp() {
@@ -54,6 +77,7 @@ void lcdSetUp() {
 
   lcd.begin(8, 2);  // 8 characters, 2 lines; the mode of operation. 
                     // How it looks:
+                    
                     // Text████
                     // █Display
 
@@ -65,25 +89,7 @@ void lcdSetUp() {
   // https://github.com/Charles-Thacher/WindTunnelSketch
 }
 
-void loadCellSetUp() {
-  // Define the pins for the HX711 communication
-  const uint8_t DATA_PIN = 6;  // Can use any pins!
-  const uint8_t CLOCK_PIN = 5; // Can use any pins!
 
-  Adafruit_HX711 hx711(DATA_PIN, CLOCK_PIN);
-
-  hx711.begin();
-
-  // read and toss 3 values each
-  Serial.println("Taring....");
-  for (uint8_t t=0; t<3; t++) {
-    hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
-    hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
-
-    hx711.tareB(hx711.readChannelRaw(CHAN_B_GAIN_32));
-    hx711.tareB(hx711.readChannelRaw(CHAN_B_GAIN_32));
-  }
-}
 
 // # Running tests here
 // a running average function which takes the n most recent readings (determined with SIZE) and averages them
@@ -112,11 +118,35 @@ int runningAverage() {
 
   arrayAvg = arraySum/SIZE;
 
-  Serial.println(arrayAvg);
+  Serial.print("Running Average: ");
+  Serial.print(arrayAvg);
+  Serial.println();
+  
 
 }
 
 
 
 // callibration
+// Callibration is currently a separate sketch
 
+
+// void loadCellSetUp() {
+//   // Define the pins for the HX711 communication
+//   const uint8_t DATA_PIN = 6;  // Can use any pins!
+//   const uint8_t CLOCK_PIN = 5; // Can use any pins!
+
+//   Adafruit_HX711 hx711(DATA_PIN, CLOCK_PIN);
+
+//   hx711.begin();
+
+//   // read and toss 3 values each
+//   Serial.println("Taring....");
+//   for (uint8_t t=0; t<3; t++) {
+//     hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
+//     hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
+
+//     hx711.tareB(hx711.readChannelRaw(CHAN_B_GAIN_32));
+//     hx711.tareB(hx711.readChannelRaw(CHAN_B_GAIN_32));
+//   }
+// }
