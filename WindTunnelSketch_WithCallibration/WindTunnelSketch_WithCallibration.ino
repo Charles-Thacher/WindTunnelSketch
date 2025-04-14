@@ -25,14 +25,21 @@ void setup() {
   // 3. Set up Load Cell and hx711
   hx711.begin();
 
-  // read and toss 3 values each
-  Serial.println("Taring....");
+  // 4. Tare load cell
+  setupTare();
+  
+  // 5. Use known weight to callibrates scale
+  callibrate();
+
+  // read and toss 3 values each.
+  // I think this has to stay in setup()
   for (uint8_t t=0; t<3; t++) {
     hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
     hx711.tareA(hx711.readChannelRaw(CHAN_A_GAIN_128));
     hx711.tareB(hx711.readChannelRaw(CHAN_B_GAIN_32));
     hx711.tareB(hx711.readChannelRaw(CHAN_B_GAIN_32));
   }
+
   
 } 
 
@@ -93,6 +100,7 @@ void lcdSetUp() {
 
 // # Running tests here
 // a running average function which takes the n most recent readings (determined with SIZE) and averages them
+// THIS IS USELESS! THE FUNCTION IS BUILT INTO THE LIBRARY!!!!
 int runningAverage() {
   const int SIZE = 5; // number of readings that will be averaged
 
@@ -130,9 +138,35 @@ int runningAverage() {
 
 
 
-// callibration
-// Callibration is currently a separate sketch
+// load cell callibration
 
+void setupTare() {
+  set.cursor(0,0);
+
+  lcd.print("ClearCll");
+  set.cursor(0,1);
+  lcd.print("Taring..");
+
+  for (int i = 5; i >= 1; --i) {
+        lcd.print(i);
+  }
+
+  tare();
+}
+
+
+void callibrate() {
+  set.cursor(0,0);
+  lcd.print("Place");
+  set.cursor(0,1);
+  lcd.print("500g");
+  for (int i = 5; i >= 1; --i) {
+        lcd.print(i);
+  }
+
+  // function from hx711
+  calibrate_scale(500);
+}
 
 // void loadCellSetUp() {
 //   // Define the pins for the HX711 communication
