@@ -7,13 +7,19 @@ float rpm = 0.0;
 
 const long interval = 500; // milliseconds per fan speed measurement
 const int pulsesPerRevolution = 2; // number of tachometer pulses per revolution
-// can check by manually rotating fan??
+
+const int points = 4;
+int pwmLevels[points] = {0,100,200,255}; 
+int inputSpeed[points];
 
 
 void setup() {
 
   Serial.begin(9600); 
   Serial.print("\n"); // cause it's annoying to start printing on the bootup line
+  Serial.println("Begin setup");
+
+  callibrateSpeed();
 
   // interrupt for fan speed calculation
   // number of counts for the fan's tachometer
@@ -32,7 +38,7 @@ void setup() {
     delay(1000);
   }
 
-  fanSpeed(255);
+  fanSpeed(10);
 
   lastmillis = millis();
 
@@ -45,7 +51,7 @@ void loop() {
 
 
 
-
+  // dynamically adjust fan speed
   // for (int speed = 0; speed <= 150; speed += 50) {
   //   fanSpeed(0);
   //     if (millis() - lastmillis >= interval) {
@@ -87,6 +93,34 @@ void fanCount() {
 
 void fanSpeed(uint8_t speed) {
   // Sets speed of 4-pin fan by analogWriting a duty cycle, speed, to the PWM pin
-  analogWrite(PWM, speed);
+  analogWrite(PWM, speed); // write "speed" to "PWM"
   // Serial.println("Fan speed set to " + String(speed));
+}
+
+void callibrateSpeed() {
+  Serial.println("Begin callibration. User must measure wind speed and input these values.");
+
+  for (int i = 0; i < points; i++) {
+    int writePWM = pwmLevels[i]; // iterate over points times; PWM set to 
+    fanSpeed(writePWM);
+
+    Serial.print("PWM set to ");
+    Serial.print(writePWM);
+    Serial.println(". Measure current speed and enter value: ");
+
+    while (Serial.available() == 0) {
+      // wait for user
+    }
+
+    inputSpeed[i] = Serial.parseInt();
+    Serial.print("Recorded speed at PWM ");
+    Serial.print(writePWM);
+    Serial.print(": ");
+    Serial.println(inputSpeed[i]);
+  }
+
+  fanSpeed(0);
+  Serial.println("Callibration finished.");
+  Serial.println("Callibration points:");
+  Serial.println("inputSpeed");
 }
