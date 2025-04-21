@@ -42,6 +42,10 @@ void loop() {
 
   Serial.print(measurement);
   Serial.println("g");
+  lcd.clear();
+  lcd.setCursor(0,0);
+  String lcdprint = String(measurement, 2) + "g";
+  lcd.print(lcdprint);
 
 }
 
