@@ -2,7 +2,7 @@
 #include <LiquidCrystal.h>
 
 // used the wrong library and switched to a different one; this just substitutes the keyword for now
-HX711 hx711;
+HX711 hx;
 
 // Define the pins for the HX711 communication
 const uint8_t DATA_PIN = 6;  // Can use any pins!
@@ -26,30 +26,26 @@ void setup() {
   }
   
   // 1. Set up LCD
-  lcdSetUp();
+  lcd_set_up();
 
   // 2. Set up Load Cell and hx711
   hx711.begin(DATA_PIN, CLOCK_PIN);
 
   // 3. calibrate load cell
-  calibrate();
+  load_cell_calibrate();
 
 
 } 
 
 void loop() {
-  float measurement = hx711.read_average(5);
-
-  Serial.print(measurement);
-  Serial.println("g");
+  float measurement = hx.get_units();
   lcd.clear();
-  lcd.setCursor(0,0);
-  String lcdprint = String(measurement, 2) + "g";
-  lcd.print(lcdprint);
-
+  lcd.setCursor(0, 0);
+  lcd.print(String(measurement, 2)+"raw");
+  
 }
 
-void lcdSetUp() {
+void lcd_set_up() {
   lcd.begin(8, 2);  // 8 characters, 2 lines; the mode of operation. 
                     // How it looks:
                     
@@ -65,56 +61,34 @@ void lcdSetUp() {
 }
 
 
-void  calibrate() {
-  Serial.println("\n\nCALIBRATION\n===========");
-  Serial.println("remove all weight from the loadcell");
-  //  flush Serial input
-  while (Serial.available()) Serial.read();
+void  load_cell_calibrate() {
+  hx.set_scale();
 
-  Serial.println("and press enter\n");
-  while (Serial.available() == 0);
+  while (Serial.available() Serial.read()); // clear user inputs
 
-  Serial.println("Determine zero weight offset");
-  //  average measurements
-  hx711.tare(AVERAGE_SAMPLES);
-  int32_t offset = hx711.get_offset();
+  Serial.println("Clear all weight from load cell.\nPress enter to continue.");
 
-  Serial.print("OFFSET: ");
-  Serial.println(offset);
-  Serial.println();
-
-  Serial.println("place a weight on the loadcell");
-  //  flush Serial input
-  while (Serial.available()) Serial.read();
-
-  Serial.println("enter the weight in (whole) grams and press enter");
-  uint32_t weight = 0;
-  while (Serial.peek() != '\n')
-  {
-    if (Serial.available())
-    {
-      char ch = Serial.read();
-      if (isdigit(ch))
-      {
-        weight *= 10;
-        weight = weight + (ch - '0');
-      }
+  while (true) {
+    if (Serial.available()) {
+      char c = Serial.read();
+      if (c == '\n' || c == '\r') {break;}
     }
   }
-  Serial.print("WEIGHT: ");
-  Serial.println(weight);
-  hx711.calibrate_scale(weight, 20);
-  float scale = hx711.get_scale();
 
-  Serial.print("SCALE:  ");
-  Serial.println(scale, 6);
+  hx.tare();
 
-  Serial.print("\nuse scale.set_offset(");
-  Serial.print(offset);
-  Serial.print("); and scale.set_scale(");
-  Serial.print(scale, 6);
-  Serial.print(");\n");
-  Serial.println("in the setup of your project");
+  Serial.println("Place 500g on the load cell.\nPress enter to continue.");
 
-  Serial.println("\n\n");
+  while (true) {
+    if (Serial.available()) {
+      char c = Serial.read();
+      if (c == '\n' || c == '\r') {break;}
+    }
+  }
+
+  float units = hx.get_units(AVERAGE_SAMPLES);
+
+  float set_factor = units / CALIBRATION_WEIGHT;
+
+  hx.set_scale(set_factor);
 }

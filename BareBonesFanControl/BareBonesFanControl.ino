@@ -63,33 +63,7 @@ void loop() {
 
 }
 
-float tachometer() {
 
-  if (millis() - lastmillis > interval) {
-    // Calculate the speed of the fan
-    noInterrupts(); // turn off interupts while transfering pulseCount
-    float pulses = fanPulse;  // Copy value to prevent changes
-    fanPulse = 0;  // Reset counter
-    interrupts();
-
-    rpm = (pulses*60.0)/(interval/1000.0)*(1.0/pulsesPerRevolution);
-
-    lastmillis = millis();
-
-    Serial.print("Pulses: ");
-    Serial.print(pulses);
-    Serial.print(", ");
-    Serial.print("FanSpeed: ");
-    Serial.println(rpm);
-
-  }
-  return rpm;
-}
-
-void fanCount() {
-  // This function is called by attachInterrupt() whenever a transition is detected on the TACH pin 
-  fanPulse += 1;
-}
 
 void fanSpeed(uint8_t speed) {
   // Sets speed of 4-pin fan by analogWriting a duty cycle, speed, to the PWM pin
