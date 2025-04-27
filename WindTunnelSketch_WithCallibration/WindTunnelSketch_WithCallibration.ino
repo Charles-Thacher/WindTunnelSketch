@@ -1,3 +1,6 @@
+// See the README on this sketch's GitHub repository for detailed wiring guide
+// https://github.com/Charles-Thacher/WindTunnelSketch
+
 #include "HX711.h"
 #include <LiquidCrystal.h>
 
@@ -8,8 +11,17 @@ HX711 hx;
 const uint8_t DATA_PIN = 6;  // Can use any pins!
 const uint8_t CLOCK_PIN = 5; // Can use any pins!
 
+// pins for fan
+const uint8_t TACH_PIN = 2;
+const uint8_t PWM_PIN = 3; // pins for server fan
+
+long n = 0; // counting void loops
+
+
 const float CALIBRATION_WEIGHT = 500.0; // keep below load cell max
 const int AVERAGE_SAMPLES = 10; // hx711 will average this number of samples
+
+const uint8_t setSpeed = 150;
 
 
 //LiquidCrystal lcd(RS, E, D4, D5, D6, D7);
@@ -29,19 +41,25 @@ void setup() {
   lcd_set_up();
 
   // 2. Set up Load Cell and hx711
-  hx711.begin(DATA_PIN, CLOCK_PIN);
+  hx.begin(DATA_PIN, CLOCK_PIN);
 
   // 3. calibrate load cell
   load_cell_calibrate();
 
+  fanSpeed(setSpeed);
 
 } 
 
 void loop() {
-  float measurement = hx.get_units();
+  long measurement = hx.get_units();
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(String(measurement, 2)+"raw");
+  lcd.print(String(measurement, 2));
+  Serial.println(measurement);
+
+  n += 1;
+  Serial.println(String(n) + " Running\n");
+  delay(1000);
   
 }
 
@@ -52,19 +70,21 @@ void lcd_set_up() {
                     // Text████
                     // █Display
 
+  lcd.setCursor(0, 0);
   lcd.print("Initiate");  // prints the value of the variable
 
+  delay(5000);
+  lcd.clear();
   Serial.println("LCD Initialized.");
   
-  // See the README on this sketch's GitHub repository for detailed wiring guide
-  // https://github.com/Charles-Thacher/WindTunnelSketch
+
 }
 
 
 void  load_cell_calibrate() {
   hx.set_scale();
 
-  while (Serial.available() Serial.read()); // clear user inputs
+  while (Serial.available()) Serial.read(); // clear user inputs
 
   Serial.println("Clear all weight from load cell.\nPress enter to continue.");
 
@@ -91,4 +111,10 @@ void  load_cell_calibrate() {
   float set_factor = units / CALIBRATION_WEIGHT;
 
   hx.set_scale(set_factor);
+}
+
+void fanSpeed(uint8_t speed) {
+  // Sets speed of 4-pin fan by analogWriting a duty cycle, speed, to the PWM pin
+  analogWrite(PWM_PIN, speed); // write "speed" to "PWM"
+
 }

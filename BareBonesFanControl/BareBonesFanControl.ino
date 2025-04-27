@@ -1,17 +1,6 @@
 #define PWM 5     // Arduino pin connected to PWM pin on 4-pin server fan
 #define TACH 3
 
-volatile float fanPulse = 0.0;
-unsigned long lastmillis = 0;
-float rpm = 0.0;
-
-const long interval = 500; // milliseconds per fan speed measurement
-const int pulsesPerRevolution = 2; // number of tachometer pulses per revolution
-
-const int points = 4;
-int pwmLevels[points] = {0,100,200,255}; 
-int inputSpeed[points];
-
 
 void setup() {
 
@@ -49,20 +38,7 @@ void loop() {
 
   tachometer();
 
-
-
-  // dynamically adjust fan speed
-  // for (int speed = 0; speed <= 150; speed += 50) {
-  //   fanSpeed(0);
-  //     if (millis() - lastmillis >= interval) {
-  //       tachometer();
-  //     }
-  //   delay(5000);
-  // }
-
-
 }
-
 
 
 void fanSpeed(uint8_t speed) {

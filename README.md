@@ -12,6 +12,8 @@ Evan Halstead, Project Advisor
 Student Opportunity Fund, Skidmore College
 
 # Wiring Guide
+Connecting all 3 parts may be a tangled mess. It is reccommended to use a breadboard. These are just the "absolute" connections you must abide by, assuming the code on the Arduino sketch has not been altered. Ensure that the constants in the sketch match with the correct pins, in any case.
+
 ## LCD to Arduino
 The LCD panel has 14 pins.
 
@@ -32,4 +34,23 @@ All other LCD pins unused.
 Pins mmust be defined and changed in sketch.
 
 ## HX711 to Arduino
+E+ wired to strain gauge red wire
+E- wired to strain gauge black wire
+A+ wired to strain gauge green wire
+A- wired to strain gauge white wire
 
+HX711 VCC to Arduino VCC
+HX711 GND to Arduino GND
+HX711 DT to Arduino 6 (customizable)
+HX711 SCK to Arduino 5 (customizable)
+
+## Server fan to Arduino
+Reference: There are two rails on the 4 prong connector for the Artic fan positioned assymetrically. This wiring guide assumes you are looking at the connector so this feature is on the LEFT. Pins are numbered 1 to 4 from left to right.
+
+Pin 1, GND, is connected to the Arduino GND.
+
+Pin 2, +12V DC, must be connected to a separate power source. The power source must be grounded in common with the Arduino.
+
+Pin 3,Tachometer, connects to the 2nd pin on the Arduino. A 1M Ohm resistor is used as a pull up resistor between the tachometer pin and the 12V power.
+
+Pin 4, PWM, is connected to a valid Arudino pwm ~ pin, in this case pin 3.
