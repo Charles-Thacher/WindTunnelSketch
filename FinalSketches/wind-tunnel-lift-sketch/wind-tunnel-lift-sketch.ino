@@ -10,18 +10,20 @@ HX711 hx;
 // Define the pins for the HX711 communication
 const uint8_t DATA_PIN = 6;  // Can use any pins!
 const uint8_t CLOCK_PIN = 5; // Can use any pins!
-
 // pins for fan
 const uint8_t TACH_PIN = 2;
 const uint8_t PWM_PIN = 3; // pins for server fan
 
-long n = 0; // counting void loops
+
+// wind speed constants
+const uint8_t SET_SPEED = 150; // PWM: set speed of fan from 0 to 255
+const float WIND_ZERO = 0.1050; // use "fitWindSpeed.m" to find
+const float WIND_SLOPE = 0.1500; // use "fitWindSpeed.m" to find
 
 
-const float CALIBRATION_WEIGHT = 500.0; // keep below load cell max
-const int AVERAGE_SAMPLES = 10; // hx711 will average this number of samples
-
-const uint8_t setSpeed = 150;
+// load cell calibration constants
+float LOAD_CELL_SET = 1.0; // generate with "load-cell-cal.ino"
+float GRAVITY = 9.81; // gravity of Earth; m/s^2
 
 
 //LiquidCrystal lcd(RS, E, D4, D5, D6, D7);
@@ -40,25 +42,29 @@ void setup() {
   // 1. Set up LCD
   lcd_set_up();
 
-  // 2. Set up Load Cell and hx711
+  // 2. Set up Load Cell and calibrate
   hx.begin(DATA_PIN, CLOCK_PIN);
+  hx.set_scale(LOAD_CELL_SET);
 
-  // 3. calibrate load cell
-  load_cell_calibrate();
-
-  fanSpeed(setSpeed);
+  // 3. Set the fan speed
+  analogWrite(SET_SPEED, PWM_PIN);
 
 } 
 
 void loop() {
-  long measurement = hx.get_units();
+  long mass_offset = hx.get_units();
+  // do some math here to convert to Newtons
+  float lift = mass_offset*GRAVITY;
+
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(String(measurement, 2));
-  Serial.println(measurement);
+  lcd.print(String(lift, 2) + "N");
+  Serial.println(lift);
 
-  n += 1;
-  Serial.println(String(n) + " Running\n");
+  float current_wind_speed = pwm_speed(SET_SPEED);
+  lcd.setCursor(1,0);
+  lcd.print(String(current_wind_speed) + "m/s");
+
   delay(1000);
   
 }
@@ -76,45 +82,15 @@ void lcd_set_up() {
   delay(5000);
   lcd.clear();
   Serial.println("LCD Initialized.");
-  
 
 }
 
+float pwm_speed(float set_speed) {
+  // calculates the wind speed based off a best fit function
+  // constants determined using MATLAB script in repo
+  float wind_speed = WIND_SLOPE*set_speed + WIND_ZERO;
 
-// void  load_cell_calibrate() {
-//   hx.set_scale();
+  return wind_speed;
+}
 
-//   while (Serial.available()) Serial.read(); // clear user inputs
 
-//   Serial.println("Clear all weight from load cell.\nPress enter to continue.");
-
-//   while (true) {
-//     if (Serial.available()) {
-//       char c = Serial.read();
-//       if (c == '\n' || c == '\r') {break;}
-//     }
-//   }
-
-//   hx.tare();
-
-//   Serial.println("Place 500g on the load cell.\nPress enter to continue.");
-
-//   while (true) {
-//     if (Serial.available()) {
-//       char c = Serial.read();
-//       if (c == '\n' || c == '\r') {break;}
-//     }
-//   }
-
-//   float units = hx.get_units(AVERAGE_SAMPLES);
-
-//   float set_factor = units / CALIBRATION_WEIGHT;
-
-//   hx.set_scale(set_factor);
-// }
-
-// void fanSpeed(uint8_t speed) {
-//   // Sets speed of 4-pin fan by analogWriting a duty cycle, speed, to the PWM pin
-//   analogWrite(PWM_PIN, speed); // write "speed" to "PWM"
-
-// }
