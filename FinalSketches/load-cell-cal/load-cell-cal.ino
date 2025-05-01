@@ -2,7 +2,7 @@
 
 HX711 hx;
 
-const float CALIBRATION_WEIGHT = 500.0; // keep below load cell max
+const float CALIBRATION_WEIGHT = 100.0; // keep below load cell max
 const int AVERAGE_SAMPLES = 10; // hx711 will average this number of samples
 
 // Define the pins for the HX711 communication
@@ -37,7 +37,7 @@ void setup() {
 
   hx.tare();
 
-  Serial.println("Place 500g on the load cell.\nPress enter to continue.");
+  Serial.println("Place " + String(CALIBRATION_WEIGHT) + "g on the load cell.\nPress enter to continue.");
 
   while (true) {
     if (Serial.available()) {
@@ -51,9 +51,10 @@ void setup() {
   float set_factor = units / CALIBRATION_WEIGHT;
 
   hx.set_scale(set_factor);
+  float offset = hx.get_offset();
 
-  Serial.println("Unit: " + String(units, 20));
-  Serial.println("Set factor is " + String(set_factor, 20));
+  Serial.println("Offset: " + String(offset, 3));
+  Serial.println("Set factor: " + String(set_factor, 3));
 
 }
 

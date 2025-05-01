@@ -34,6 +34,8 @@ function [slope, intercept, eqnStr] = fitWindSpeed(pwmScales, windSpeeds)
     pwmFine = linspace(min(pwmScales), max(pwmScales), 100);
     windFine = polyval(coeffs, pwmFine);
     plot(pwmFine, windFine, 'r-', 'LineWidth', 2, 'DisplayName', 'Best Fit Line');
+    xlim([0 255])
+    ylim([0 round((windSpeeds(4)+3))])
     xlabel('PWM Scale (0-255)');
     ylabel('Wind Speed');
     title('Linear Fit of Wind Speed vs PWM');
