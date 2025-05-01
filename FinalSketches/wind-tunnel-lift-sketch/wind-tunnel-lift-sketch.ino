@@ -31,8 +31,8 @@ const float WIND_SLOPE = 0.021724; // use "fitWindSpeed.m" to find
 
 
 // load cell calibration constants
-float LOAD_CELL_SCALE = -750.978; // generate with "load-cell-cal.ino"
-float LOAD_CELL_OFFSET = 1.0;
+float LOAD_CELL_SCALE = -751.710; // generate with "load-cell-cal.ino"
+float LOAD_CELL_OFFSET = 273818.000;
 float GRAVITY = -9.81; // gravity of Earth; m/s^2
 
 
@@ -76,8 +76,10 @@ void loop() {
 
   float mass_offset = hx.get_units();
   // do some math here to convert to Newtons
-  Serial.println("Mass Offset: " + String(mass_offset));
-  float lift = mass_offset*GRAVITY;
+  float kilograms = mass_offset*(1.0/1000.0);
+  Serial.println("Mass: " + String(kilograms) + "kg");
+
+  float lift = (mass_offset/1000.0)*GRAVITY;
 
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -88,7 +90,7 @@ void loop() {
   lcd.setCursor(0, 1);
   lcd.print(String(current_wind_speed) + "m/s");
   Serial.println(String(current_wind_speed) + "m/s");
-
+  delay(1000);
   lcd.clear();
 
   delay(1000);
