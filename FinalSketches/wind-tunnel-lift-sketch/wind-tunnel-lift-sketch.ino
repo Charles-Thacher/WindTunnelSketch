@@ -79,7 +79,7 @@ void loop() {
   float kilograms = mass_offset*(1.0/1000.0);
   Serial.println("Mass: " + String(kilograms) + "kg");
 
-  float lift = (mass_offset/1000.0)*GRAVITY;
+  float lift = (mass_offset/1000.0)*GRAVITY + 0.16;
 
   lcd.clear();
   lcd.setCursor(0, 0);
